@@ -1,0 +1,15 @@
+scripts
+components/
+docs
+vite.config.js
+src
+.vscode
+.storybook
+public
+.eslintignore
+.eslintrc.cjs
+.prettierigonre
+.prettierrc
+index.html
+jsconfig.json
+svelte.config.js

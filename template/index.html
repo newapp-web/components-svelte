@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Svelte Component in Pure JS</title>
+  <link rel="stylesheet" href="./lib/lib.css">
+</head>
+<body>
+  <div id="my-component">
+    <div style="height: 1000px;"></div>
+  </div>
+  
+</body>
+<script src="./lib/lib.umd.js"></script>
+
+  <script>
+    console.log(window.SLib)
+    const { Button , ShareBar} = window.SLib;
+
+    const target = document.getElementById('my-component');
+    new Button({
+      target,
+      props: {
+        text: 'Svelte'
+      }
+    });
+    
+    new ShareBar({
+      target,
+      props: {
+        title: 'Svelte2',
+        appId: 'test2',
+        portal: 'test',
+        onClick(item){
+          alert(item)
+        },
+        onShow(){
+          
+        }
+      }
+    });
+  </script>
+</html>
