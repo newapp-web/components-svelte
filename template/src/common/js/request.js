@@ -1,36 +1,90 @@
-import axios from "axios";
-// 创建axios实例
-const service = axios.create({});
-
-/**
- * @name clientConfig
- * @description 请求自定义配置项
- */
-// request拦截器
-service.interceptors.request.use(
-  (config) => {
-    console.log("config: ", config);
-    Object.assign(config.params, {
-      v: 2,
-    });
-    
-    return config;
-  },
-  (error) => {
-    console.log("Network error, Please try later!");
-    return Promise.reject(error);
+class HttpRequest {
+  constructor(baseURL) {
+    this.baseURL = baseURL;
+    this.interceptors = {
+      request: [],
+      response: []
+    };
   }
-);
 
-// response 拦截器
-service.interceptors.response.use(
-  (response) => {
-    return response.data;
-  },
-  (error) => {
-    console.log("The system is busy, please try later.");
-    return Promise.reject(error);
+  // Add a request interceptor
+  addRequestInterceptor(interceptor) {
+    this.interceptors.request.push(interceptor);
   }
-);
 
-export default service;
+  // Add a response interceptor
+  addResponseInterceptor(interceptor) {
+    this.interceptors.response.push(interceptor);
+  }
+
+  async request(method, url, data = null, options = {}) {
+    // Apply request interceptors
+    let config = { method, ...options };
+    config.url = `${this.baseURL}${url}`;
+    config.headers = config.headers || {};
+
+    for (let interceptor of this.interceptors.request) {
+      config = interceptor(config) || config;
+    }
+
+    // Prepare fetch options
+    const fetchOptions = {
+      method: config.method,
+      headers: config.headers
+    };
+
+    if (method === 'GET' && data) {
+      // Convert data to query string for GET request
+      const params = new URLSearchParams(data).toString();
+      config.url += `?${params}`;
+    } else if (data) {
+      fetchOptions.body = JSON.stringify(data);
+    }
+
+    // Execute the request
+    let response;
+    try {
+      response = await fetch(config.url, fetchOptions);
+    } catch (error) {
+      // Handle network errors
+      return Promise.reject(error);
+    }
+
+    // Apply response interceptors
+    for (let interceptor of this.interceptors.response) {
+      response = await interceptor(response) || response;
+    }
+
+    // Parse response
+    let responseData;
+    try {
+      responseData = await response.json();
+    } catch (error) {
+      responseData = null;
+    }
+
+    if (!response.ok) {
+      return Promise.reject(responseData);
+    }
+
+    return responseData;
+  }
+
+  get(url, params = {}, options = {}) {
+    return this.request('GET', url, params, options);
+  }
+
+  post(url, data, options = {}) {
+    return this.request('POST', url, data, options);
+  }
+
+  put(url, data, options = {}) {
+    return this.request('PUT', url, data, options);
+  }
+
+  delete(url, data, options = {}) {
+    return this.request('DELETE', url, data, options);
+  }
+}
+
+export default HttpRequest

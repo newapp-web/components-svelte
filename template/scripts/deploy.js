@@ -2,7 +2,8 @@
 const libName = "hummer-components-anyJS";
 
 (async () => {
-  const { deployDocsToWebOrg } = await import("@shareit/deploy-engine");
+try {
+  const { deployDocsToWebOrg } = await import("deploy-engine-s3");
   const res = await deployDocsToWebOrg(
     libName,
     "./storybook-static",
@@ -10,4 +11,8 @@ const libName = "hummer-components-anyJS";
   );
   console.log(res);
   console.log(`http://${res.domain}/${libName}/`);
+} catch (error) {
+  console.log("🚀 ~ file: deploy.js:15 ~ error:", error)
+  
+}
 })();

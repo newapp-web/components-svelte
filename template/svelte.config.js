@@ -8,6 +8,9 @@ export default {
     if(waring.code.startsWith('a11y-')){
       return
     }
+    if (waring.code === "css-unused-selector") {
+			return;
+		}
     handler(waring)
   }
 }

@@ -21,7 +21,7 @@ const source = {
   dirname: "lib",
 };
 (async () => {
-  const { uploadToS3AndInvalidation } = await import("@shareit/deploy-engine");
+  const { uploadToS3AndInvalidation } = await import("deploy-engine-s3");
   const a = await uploadToS3AndInvalidation(source, config, ['/hcanyjs/*']);
   console.log(a);
 
